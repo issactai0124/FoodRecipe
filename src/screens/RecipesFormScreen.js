@@ -1,18 +1,54 @@
-import { View,Text,TextInput,TouchableOpacity,Image,StyleSheet,} from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+} from "react-native";
 import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function RecipesFormScreen({ route, navigation }) {
   const { recipeToEdit, recipeIndex, onrecipeEdited } = route.params || {};
   const [title, setTitle] = useState(recipeToEdit ? recipeToEdit.title : "");
+  const [ingredientsList, setIngredientsList] = useState(
+    recipeToEdit ? recipeToEdit.ingredientsList : ""
+  );
   const [image, setImage] = useState(recipeToEdit ? recipeToEdit.image : "");
   const [description, setDescription] = useState(
     recipeToEdit ? recipeToEdit.description : ""
   );
 
   const saverecipe = async () => {
- 
+    console.log("Saving recipe...");
+    try {
+      const newrecipe = {
+        title,
+        image,
+        ingredientsList,
+        description,
+        // Preserve idFood when editing, else create a new unique id with timestamp
+        idFood: recipeToEdit ? recipeToEdit.idFood : `custom_${Date.now()}`,
+      };
+      const existingrecipes = await AsyncStorage.getItem("customrecipes");
+      const recipes = existingrecipes ? JSON.parse(existingrecipes) : [];
+      if (recipeToEdit) {
+        recipes[recipeIndex] = newrecipe;
+        await AsyncStorage.setItem("customrecipes", JSON.stringify(recipes));
+        onrecipeEdited();
+      } else {
+        recipes.push(newrecipe);
+        await AsyncStorage.setItem("customrecipes", JSON.stringify(recipes));
+      }
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error saving recipe:", error);
+    }
   };
 
   return (
@@ -34,8 +70,18 @@ export default function RecipesFormScreen({ route, navigation }) {
       ) : (
         <Text style={styles.imagePlaceholder}>Upload Image URL</Text>
       )}
+
       <TextInput
-        placeholder="Description"
+        placeholder="Ingredients List"
+        value={ingredientsList}
+        onChangeText={setIngredientsList}
+        multiline={true}
+        numberOfLines={4}
+        style={[styles.input, { height: hp(20), textAlignVertical: "top" }]}
+      />
+
+      <TextInput
+        placeholder="Step-by-step instructions"
         value={description}
         onChangeText={setDescription}
         multiline={true}
@@ -58,12 +104,12 @@ const styles = StyleSheet.create({
     marginTop: hp(4),
     borderWidth: 1,
     borderColor: "#ddd",
-    padding: wp(.5),
+    padding: wp(0.5),
     marginVertical: hp(1),
   },
   image: {
     width: 300,
-    height:200,
+    height: 200,
     margin: wp(2),
   },
   imagePlaceholder: {
@@ -78,7 +124,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#4F75FF",
-    padding: wp(.5),
+    padding: wp(0.5),
     alignItems: "center",
     borderRadius: 5,
     marginTop: hp(2),

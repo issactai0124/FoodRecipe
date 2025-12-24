@@ -21,9 +21,7 @@ export default function FavoriteScreen() {
   const favoriteRecipes = useSelector((state) => state.favorites);
   const favoriteRecipesList = favoriteRecipes?.favoriterecipes || [];
   console.log(favoriteRecipes.favoriterecipes);
-  console.log('favoriteRecipesList',favoriteRecipesList);
-  
-  
+  console.log("favoriteRecipesList", favoriteRecipesList);
 
   if (favoriteRecipesList.length === 0) {
     return (
@@ -58,7 +56,7 @@ export default function FavoriteScreen() {
           My Favorite Recipes
         </Text>
       </View>
-    
+
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={{
@@ -71,9 +69,39 @@ export default function FavoriteScreen() {
           marginLeft: 20,
         }}
       >
-        <Text style={{ color: "#fff" }}>Go back</Text>
+        <Text style={{ color: "#fff", marginBottom: 10 }}>Go back</Text>
       </TouchableOpacity>
-    
+
+      {/* List of Favorite Recipes */}
+      <FlatList
+        data={favoriteRecipesList}
+        contentContainerStyle={styles.listContentContainer}
+        keyExtractor={(item) => item.idFood}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              // If the recipe has recipeName, it's from API, otherwise it's custom
+              if (item.recipeName) {
+                navigation.navigate("RecipeDetail", { ...item });
+              } else {
+                navigation.navigate("CustomRecipesScreen", { recipe: item });
+              }
+            }}
+            style={styles.cardContainer}
+          >
+            <Image
+              source={{ uri: item.recipeImage || item.image }}
+              style={styles.recipeImage}
+            />
+            <Text style={styles.recipeTitle}>
+              {(item.recipeName || item.title)?.length > 20
+                ? (item.recipeName || item.title).slice(0, 20) + "..."
+                : item.recipeName || item.title}
+            </Text>
+          </TouchableOpacity>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
     </>
   );
 }
