@@ -2,7 +2,7 @@
 
 ## Description
 
-This repository is a practice project from the ["React Native: Developing Android and iOS Apps"] (https://www.coursera.org/learn/react-native-developing-android-and-ios-apps) course by IBM on Coursera. It is a fully functional recipe application built with React Native, designed to provide a seamless user experience for discovering, adding, and managing favorite recipes.
+This repository is a practice project from the ["React Native: Developing Android and iOS Apps"](https://www.coursera.org/learn/react-native-developing-android-and-ios-apps) course by IBM on Coursera. It is a fully functional recipe application built with React Native, designed to provide a seamless user experience for discovering, adding, and managing favorite recipes.
 
 ## Features
 
